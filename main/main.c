@@ -115,7 +115,7 @@ void app_main(void)
     update_partition();
  
     const esp_partition_t *running = esp_ota_get_running_partition();
-    ESP_LOGI(TAG, "Running OTA partition subtype %s )", get_subtype_str(running->subtype));
+    ESP_LOGI(TAG, "Running OTA partition subtype %s", get_subtype_str(running->subtype));
 
     const esp_partition_t *next_boot_partition = NULL;
     next_boot_partition = esp_ota_get_next_update_partition(NULL);
@@ -124,13 +124,11 @@ void app_main(void)
         esp_err_t err = esp_ota_set_boot_partition(next_boot_partition);
         if (err == ESP_OK) {
             ESP_LOGI(TAG, "Next OTA boot partition successfully set");
+            vTaskDelay(pdMS_TO_TICKS(5000));  //enough delay so that you can flash and enter monitor mode without it having already completed
+            esp_restart();
         } else {
             ESP_LOGE(TAG, "Failed to set next OTA boot partition: %s", esp_err_to_name(err));
         }
     }
-
-    const esp_partition_t *boot_partition = esp_ota_get_boot_partition();
-    ESP_LOGI(TAG, "Next OTA boot partition subtype %s )", get_subtype_str(boot_partition->subtype));
-
 
 }
